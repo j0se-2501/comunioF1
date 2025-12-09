@@ -69,7 +69,8 @@ class ResultController extends Controller
 
         $race = Race::findOrFail($raceId);
 
-        $race->update(['status' => 'completed']);
+        // Marcar resultados como confirmados con el flag existente
+        $race->update(['is_result_confirmed' => true]);
 
         return response()->json([
             'message' => 'Race confirmed successfully'

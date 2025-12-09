@@ -14,6 +14,7 @@ class Race extends Model
         'race_date',
         'qualy_date',
         'status',
+        'is_result_confirmed',
     ];
 
     public function season()

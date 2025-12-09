@@ -8,6 +8,8 @@ use Illuminate\Http\Middleware\HandleCors;
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
+        api: __DIR__.'/../routes/api.php',
+        apiPrefix: 'api',
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
@@ -15,12 +17,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(HandleCors::class);
 
         $middleware->group('api', [
-            fn ($req, $next) => tap($next($req), function ($res) {
-                $res->headers->set('Access-Control-Allow-Origin', 'http://localhost:3000');
-                $res->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
-                $res->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-                $res->headers->set('Access-Control-Allow-Credentials', 'true');
-            })
+            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+            \Illuminate\Session\Middleware\StartSession::class,
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
