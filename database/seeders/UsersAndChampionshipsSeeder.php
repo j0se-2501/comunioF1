@@ -14,20 +14,21 @@ class UsersAndChampionshipsSeeder extends Seeder
 {
     public function run(): void
     {
-        // Función para generar un casco aleatorio
+        // Función para generar un casco aleatorio (URL absoluta al backend)
         $randomHelmet = function () {
             $num = str_pad(rand(1, 20), 2, '0', STR_PAD_LEFT);
-            return "images/helmet_icons/{$num}.png"; // dentro de public/
+            $base = rtrim(config('app.url'), '/');
+            return "{$base}/images/helmet_icons/{$num}.png";
         };
 
         // Admin global de la plataforma
         $admin = User::create([
-            'name'      => 'Admin',
-            'email'     => 'admin@admin.com',
-            'password'  => Hash::make('admin'),
-            'is_admin'  => true,
-            'country'   => '🇪🇸',
-            'profile_pic' => $randomHelmet(),
+            'name'       => 'Admin',
+            'email'      => 'admin@admin.com',
+            'password'   => Hash::make('admin'),
+            'is_admin'   => true,
+            'country'    => '🇪🇸',
+            'profile_pic'=> $randomHelmet(),
         ]);
 
         // 30 usuarios Usuario01 .. Usuario30
@@ -37,11 +38,11 @@ class UsersAndChampionshipsSeeder extends Seeder
             $username = sprintf('Usuario%02d', $i);
 
             $users[$i] = User::create([
-                'name'      => $username,
-                'email'     => strtolower($username) . '@example.com',
-                'password'  => Hash::make('password'),
-                'is_admin'  => false,
-                'country'   => '🇪🇸',
+                'name'        => $username,
+                'email'       => strtolower($username) . '@example.com',
+                'password'    => Hash::make('password'),
+                'is_admin'    => false,
+                'country'     => '🇪🇸',
                 'profile_pic' => $randomHelmet(),
             ]);
         }
