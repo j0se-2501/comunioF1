@@ -21,6 +21,7 @@ class AuthController extends Controller
             'email'    => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed',
             'country'  => 'nullable|string|max:8',
+            'profile_pic' => 'nullable|string|max:255',
         ]);
 
         $user = User::create([
@@ -28,6 +29,7 @@ class AuthController extends Controller
             'email'    => $data['email'],
             'password' => Hash::make($data['password']),
             'country'  => $data['country'] ?? null,
+            'profile_pic' => $data['profile_pic'] ?? null,
         ]);
 
         // Autologin tras registro
