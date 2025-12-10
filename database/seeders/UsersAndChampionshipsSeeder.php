@@ -47,6 +47,9 @@ class UsersAndChampionshipsSeeder extends Seeder
             ]);
         }
 
+        // Reindex para formar grupos de 10 usuarios por campeonato
+        $userChunks = array_chunk(array_values($users), 10);
+
         // Obtener season 2026
         $season = Season::where('year', 2026)->firstOrFail();
 
@@ -94,21 +97,21 @@ class UsersAndChampionshipsSeeder extends Seeder
         $createChampionship(
             'Liga de la clase',
             $users[1],
-            [$users[1], $users[4], $users[5]]
+            $userChunks[0] ?? []
         );
 
         // Championship 2
         $createChampionship(
             'Torneo de los becarios',
-            $users[2],
-            [$users[2], $users[6], $users[7]]
+            $users[11] ?? $users[2],
+            $userChunks[1] ?? []
         );
 
         // Championship 3
         $createChampionship(
             'Campeonato de los colegas',
-            $users[3],
-            [$users[3], $users[8], $users[9]]
+            $users[21] ?? $users[3],
+            $userChunks[2] ?? []
         );
     }
 }

@@ -35,13 +35,21 @@ class ChampionshipController extends Controller
      */
     public function store(Request $request)
     {
+        $user = Auth::user();
+
+        if ($user->championships()->count() >= 5) {
+            return response()->json([
+                'message' => 'No puedes estar en mas de 5 campeonatos a la vez'
+            ], 403);
+        }
+
         $data = $request->validate([
             'season_id' => 'required|exists:seasons,id',
             'name'      => 'required|string|max:255',
         ]);
 
         $championship = Championship::create([
-            'admin_id'        => Auth::id(),
+            'admin_id'        => $user->id,
             'season_id'       => $data['season_id'],
             'name'            => $data['name'],
             'invitation_code' => Str::random(10),
@@ -63,7 +71,7 @@ class ChampionshipController extends Controller
         ]);
 
         // El admin entra automáticamente como miembro
-        $championship->users()->attach(Auth::id(), [
+        $championship->users()->attach($user->id, [
             'total_points' => 0,
             'is_banned'    => false,
             'position'     => null,
@@ -174,6 +182,14 @@ class ChampionshipController extends Controller
         // Si ya está unido, devolver ok
         if ($championship->users()->where('user_id', $user->id)->exists()) {
             return response()->json(['message' => 'Already joined'], 200);
+        }
+
+        if ($user->championships()->count() >= 5) {
+            return response()->json(['message' => 'No puedes estar en mas de 5 campeonatos a la vez'], 403);
+        }
+
+        if ($championship->users()->count() >= 20) {
+            return response()->json(['message' => 'El campeonato ya tiene el maximo de 20 usuarios'], 403);
         }
 
         $championship->users()->attach($user->id, [
@@ -301,3 +317,4 @@ class ChampionshipController extends Controller
         }
     }
 }
+

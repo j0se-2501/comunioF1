@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
         Season2026Seeder::class,
         TeamsAndDriversSeeder::class,
         UsersAndChampionshipsSeeder::class,
+        PredictionsAndPointsSeeder::class,
     ]);
 }
 
