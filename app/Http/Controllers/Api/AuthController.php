@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -43,10 +44,19 @@ class AuthController extends Controller
      * Login
      */
     public function login(Request $request)
-    {
+    {   
+        return response()->json($request->all());
+
         $credentials = $request->validate([
             'email'    => 'required|string|email',
             'password' => 'required|string'
+        ]);
+
+        $user = User::where('email', $credentials['email'])->first();
+        Log::info('login_attempt', [
+            'email' => $credentials['email'],
+            'found' => (bool) $user,
+            'hash_check' => $user ? Hash::check($credentials['password'], $user->password) : null,
         ]);
 
         if (!Auth::attempt($credentials)) {
