@@ -37,7 +37,12 @@ class ChampionshipController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->championships()->count() >= 5) {
+        // Limite se calcula solo con campeonatos donde no está baneado
+        $activeUserChampCount = $user->championships()
+            ->wherePivot('is_banned', false)
+            ->count();
+
+        if ($activeUserChampCount >= 5) {
             return response()->json([
                 'message' => 'No puedes estar en mas de 5 campeonatos a la vez'
             ], 403);
@@ -184,11 +189,19 @@ class ChampionshipController extends Controller
             return response()->json(['message' => 'Already joined'], 200);
         }
 
-        if ($user->championships()->count() >= 5) {
+        $activeUserChampCount = $user->championships()
+            ->wherePivot('is_banned', false)
+            ->count();
+
+        if ($activeUserChampCount >= 5) {
             return response()->json(['message' => 'No puedes estar en mas de 5 campeonatos a la vez'], 403);
         }
 
-        if ($championship->users()->count() >= 20) {
+        $activeChampUsers = $championship->users()
+            ->wherePivot('is_banned', false)
+            ->count();
+
+        if ($activeChampUsers >= 20) {
             return response()->json(['message' => 'El campeonato ya tiene el maximo de 20 usuarios'], 403);
         }
 
@@ -271,6 +284,38 @@ class ChampionshipController extends Controller
 
         $members = $championship
             ->users()
+            ->withPivot(['total_points', 'is_banned', 'position'])
+            ->get();
+
+        return response()->json($members);
+    }
+
+    /**
+     * Listar miembros no baneados
+     */
+    public function activeMembers($id)
+    {
+        $championship = Championship::findOrFail($id);
+
+        $members = $championship
+            ->users()
+            ->wherePivot('is_banned', false)
+            ->withPivot(['total_points', 'is_banned', 'position'])
+            ->get();
+
+        return response()->json($members);
+    }
+
+    /**
+     * Listar miembros baneados
+     */
+    public function bannedMembers($id)
+    {
+        $championship = Championship::findOrFail($id);
+
+        $members = $championship
+            ->users()
+            ->wherePivot('is_banned', true)
             ->withPivot(['total_points', 'is_banned', 'position'])
             ->get();
 

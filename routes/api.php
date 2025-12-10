@@ -48,6 +48,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/{id}/leave', [ChampionshipController::class, 'leave']);
 
         Route::get('/{id}/members', [ChampionshipController::class, 'members']);
+        Route::get('/{id}/members/active', [ChampionshipController::class, 'activeMembers']);
+        Route::get('/{id}/members/banned', [ChampionshipController::class, 'bannedMembers']);
         Route::post('/{id}/ban/{userId}', [ChampionshipController::class, 'banUser']);
         Route::post('/{id}/unban/{userId}', [ChampionshipController::class, 'unbanUser']);
 
