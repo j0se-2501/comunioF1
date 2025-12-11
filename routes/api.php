@@ -70,6 +70,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Predictions
     Route::get('/championships/{id}/races/next', [PredictionController::class, 'nextRace']);
     Route::get('/championships/{id}/races/{raceId}/prediction', [PredictionController::class, 'show']);
+    Route::get('/championships/{id}/races/{raceId}/predictions/{userId}', [PredictionController::class, 'showUser']);
     Route::post('/championships/{id}/races/{raceId}/prediction', [PredictionController::class, 'store']);
 
     // Races (consulta)
