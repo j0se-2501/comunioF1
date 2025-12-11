@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\RaceController;
 use App\Http\Controllers\Api\ResultController;
 use App\Http\Controllers\Api\ScoringController;
 use App\Http\Controllers\Api\DriverController;
+use App\Http\Controllers\Api\SeasonController;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,6 +38,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Drivers
     Route::get('/drivers', [DriverController::class, 'index']);
+
+    // Seasons
+    Route::get('/seasons', [SeasonController::class, 'index']);
 
     // Championships
     Route::prefix('championships')->group(function () {
