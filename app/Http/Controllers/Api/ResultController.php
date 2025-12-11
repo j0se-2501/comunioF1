@@ -262,4 +262,17 @@ class ResultController extends Controller
             $position++;
         }
     }
+
+    /**
+     * Obtener race points filtrados por campeonato y carrera
+     */
+    public function racePoints($championshipId, $raceId)
+    {
+        $racePoints = RacePoint::where('championship_id', $championshipId)
+            ->where('race_id', $raceId)
+            ->with(['user', 'prediction', 'race'])
+            ->get();
+
+        return response()->json($racePoints);
+    }
 }

@@ -74,6 +74,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Races (consulta)
     Route::get('/races/next', [RaceController::class, 'next']);
+    Route::get('/races/last', [RaceController::class, 'last']);
     Route::get('/seasons/{seasonId}/races', [RaceController::class, 'index']);
     Route::get('/races/{raceId}', [RaceController::class, 'show']);
     Route::get('/races/{raceId}/results', [RaceController::class, 'results']);
@@ -82,4 +83,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/races/{raceId}/results', [ResultController::class, 'store']);
     Route::post('/races/{raceId}/confirm', [ResultController::class, 'confirm']);
     Route::post('/races/{raceId}/calculate', [ResultController::class, 'calculate']);
+    Route::get('/championships/{championshipId}/races/{raceId}/race-points', [ResultController::class, 'racePoints']);
 });

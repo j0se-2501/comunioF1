@@ -35,6 +35,31 @@ class RaceController extends Controller
     }
 
     /**
+     * Última carrera disputada de la season actual (última confirmada)
+     */
+    public function last()
+    {
+        $season = Season::where('is_current_season', true)->first();
+
+        if (!$season) {
+            return response()->json(['message' => 'No hay season marcada como actual'], 404);
+        }
+
+        $race = Race::where('season_id', $season->id)
+            ->where('is_result_confirmed', true)
+            ->orderBy('round', 'desc')
+            ->first();
+
+        if (!$race) {
+            return response()->json(['message' => 'No hay carreras confirmadas en la season actual'], 404);
+        }
+
+        $race->load('season');
+
+        return response()->json($race);
+    }
+
+    /**
      * Listar todas las carreras de una season
      */
     public function index($seasonId)

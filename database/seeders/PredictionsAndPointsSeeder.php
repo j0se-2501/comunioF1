@@ -45,15 +45,13 @@ class PredictionsAndPointsSeeder extends Seeder
                 }
 
                 // Seed predictions for every user in the championship
-                foreach ($championship->users as $userIndex => $user) {
-                    $offset = ($raceIndex + $userIndex) % $driverCount;
-                    $grid = array_merge(
-                        array_slice($driverIds, $offset),
-                        array_slice($driverIds, 0, $offset)
-                    );
+                foreach ($championship->users as $user) {
+                    $grid = $driverIds;
+                    shuffle($grid);
 
-                    // Garantizar al menos 6 posiciones
-                    $positions = array_pad($grid, 6, null);
+                    $positions = array_slice($grid, 0, 6);
+                    $poleIndex = 0;
+                    $fastestIndex = mt_rand(0, max(0, min(5, $driverCount - 1)));
 
                     Prediction::updateOrCreate(
                         [
@@ -62,15 +60,15 @@ class PredictionsAndPointsSeeder extends Seeder
                             'championship_id' => $championship->id,
                         ],
                         [
-                            'position_1'  => $positions[0],
-                            'position_2'  => $positions[1],
-                            'position_3'  => $positions[2],
-                            'position_4'  => $positions[3],
-                            'position_5'  => $positions[4],
-                            'position_6'  => $positions[5],
-                            'pole'        => $positions[0],
-                            'fastest_lap' => $positions[3] ?? null,
-                            'last_place'  => end($grid),
+                            'position_1'  => $positions[0] ?? null,
+                            'position_2'  => $positions[1] ?? null,
+                            'position_3'  => $positions[2] ?? null,
+                            'position_4'  => $positions[3] ?? null,
+                            'position_5'  => $positions[4] ?? null,
+                            'position_6'  => $positions[5] ?? null,
+                            'pole'        => $grid[$poleIndex] ?? null,
+                            'fastest_lap' => $grid[$fastestIndex] ?? null,
+                            'last_place'  => end($grid) ?: null,
                         ]
                     );
                 }

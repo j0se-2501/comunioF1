@@ -48,7 +48,7 @@ class Season2026Seeder extends Seeder
             ['Abu Dhabi', '2026-12-06'],
         ];
 
-        // Drivers ordenados por id para resultados consistentes
+        // Drivers para componer resultados; se barajan por carrera
         $driverIds = Driver::orderBy('id')->pluck('id')->all();
         $driverCount = count($driverIds);
 
@@ -67,22 +67,22 @@ class Season2026Seeder extends Seeder
                 'is_result_confirmed'  => $index < 7,
             ]);
 
-            // Para las primeras 7 carreras, generar resultados completos
+            // Para las primeras 7 carreras, generar resultados completos (aleatorios)
             if ($index < 7 && $driverCount > 0) {
-                // Rotar parrilla para variar ganadores en cada ronda
-                $offset = $index % $driverCount;
-                $rotated = array_merge(
-                    array_slice($driverIds, $offset),
-                    array_slice($driverIds, 0, $offset)
-                );
+                $grid = $driverIds;
+                shuffle($grid);
 
-                foreach ($rotated as $pos => $driverId) {
+                // Elegir aleatoriamente quién hace la vuelta rápida (entre top 10 o toda la parrilla si <10)
+                $fastestIndexPool = min(9, $driverCount - 1);
+                $fastestLapIndex = mt_rand(0, $fastestIndexPool);
+
+                foreach ($grid as $pos => $driverId) {
                     RaceResult::create([
                         'race_id'       => $raceModel->id,
                         'driver_id'     => $driverId,
                         'position'      => $pos + 1,
                         'is_pole'       => $pos === 0,
-                        'fastest_lap'   => $pos === 3, // 4o marca la vuelta rapida
+                        'fastest_lap'   => $pos === $fastestLapIndex,
                         'is_last_place' => $pos === $driverCount - 1,
                     ]);
                 }
