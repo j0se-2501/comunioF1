@@ -10,6 +10,31 @@ use Illuminate\Http\Request;
 class RaceController extends Controller
 {
     /**
+     * Próxima carrera de la season actual (primera sin resultado confirmado)
+     */
+    public function next()
+    {
+        $season = Season::where('is_current_season', true)->first();
+
+        if (!$season) {
+            return response()->json(['message' => 'No hay season marcada como actual'], 404);
+        }
+
+        $race = Race::where('season_id', $season->id)
+            ->where('is_result_confirmed', false)
+            ->orderBy('round', 'asc')
+            ->first();
+
+        if (!$race) {
+            return response()->json(['message' => 'No quedan carreras pendientes en la season actual'], 404);
+        }
+
+        $race->load('season');
+
+        return response()->json($race);
+    }
+
+    /**
      * Listar todas las carreras de una season
      */
     public function index($seasonId)

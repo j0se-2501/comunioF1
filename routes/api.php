@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\PredictionController;
 use App\Http\Controllers\Api\RaceController;
 use App\Http\Controllers\Api\ResultController;
 use App\Http\Controllers\Api\ScoringController;
+use App\Http\Controllers\Api\DriverController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,6 +34,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/user/password', [UserController::class, 'updatePassword']);
     Route::get('/user/championships', [UserController::class, 'championships']);
     Route::get('/users/{user}', [UserController::class, 'show']);
+
+    // Drivers
+    Route::get('/drivers', [DriverController::class, 'index']);
 
     // Championships
     Route::prefix('championships')->group(function () {
@@ -69,6 +73,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/championships/{id}/races/{raceId}/prediction', [PredictionController::class, 'store']);
 
     // Races (consulta)
+    Route::get('/races/next', [RaceController::class, 'next']);
     Route::get('/seasons/{seasonId}/races', [RaceController::class, 'index']);
     Route::get('/races/{raceId}', [RaceController::class, 'show']);
     Route::get('/races/{raceId}/results', [RaceController::class, 'results']);

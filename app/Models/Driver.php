@@ -10,7 +10,7 @@ class Driver extends Model
         'team_id',
         'name',
         'country',
-        'code',
+        'short_code',
         'number',
     ];
 
