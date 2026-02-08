@@ -4,8 +4,8 @@ namespace Tests\Unit;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 use Illuminate\Support\Facades\Hash;
+use Tests\TestCase;
 
 class AuthControllerTest extends TestCase
 {
@@ -13,15 +13,19 @@ class AuthControllerTest extends TestCase
 
     public function test_register_creates_user_and_logs_in(): void
     {
+        config(['sanctum.stateful' => ['localhost:3000']]);
+
         $payload = [
             'name' => 'Tester',
             'email' => 'tester@example.com',
             'password' => 'secret123',
             'password_confirmation' => 'secret123',
-            'country' => '🇪🇸',
+            'country' => 'ES',
         ];
 
-        $response = $this->postJson('/api/register', $payload);
+        $response = $this
+            ->withHeader('Origin', 'http://localhost:3000')
+            ->postJson('/api/register', $payload);
 
         $response->assertStatus(200);
         $this->assertAuthenticated();
