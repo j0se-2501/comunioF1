@@ -128,7 +128,7 @@ class ResultControllerTest extends TestCase
         $this->actingAs($admin)->postJson("/api/races/{$race->id}/results", [
             'results' => [
                 ['driver_id' => $driverWin->id, 'position' => 1, 'is_pole' => false, 'fastest_lap' => false, 'is_last_place' => false],
-                ['driver_id' => $driverPole->id, 'position' => 2, 'is_pole' => true, 'fastest_lap' => false, 'is_last_place' => false],
+                ['driver_id' => $driverPole->id, 'position' => 2, 'is_pole' => true, 'fastest_lap' => false, 'is_last_place' => true],
             ],
         ])->assertStatus(200);
 
@@ -179,7 +179,7 @@ class ResultControllerTest extends TestCase
         $this->actingAs($admin)
             ->postJson("/api/races/{$race->id}/results", [
                 'results' => [
-                    ['driver_id' => $d1->id, 'position' => 1, 'is_pole' => true, 'fastest_lap' => false, 'is_last_place' => false],
+                    ['driver_id' => $d1->id, 'position' => 1, 'is_pole' => true, 'fastest_lap' => false, 'is_last_place' => true],
                 ],
             ])
             ->assertOk();
@@ -188,7 +188,7 @@ class ResultControllerTest extends TestCase
         $this->actingAs($admin)
             ->postJson("/api/races/{$race->id}/results", [
                 'results' => [
-                    ['driver_id' => $d2->id, 'position' => 1, 'is_pole' => true, 'fastest_lap' => true, 'is_last_place' => false],
+                    ['driver_id' => $d2->id, 'position' => 1, 'is_pole' => true, 'fastest_lap' => true, 'is_last_place' => true],
                 ],
             ])
             ->assertOk();
@@ -207,5 +207,77 @@ class ResultControllerTest extends TestCase
             ->assertOk();
 
         $this->assertTrue((bool) $race->fresh()->is_result_confirmed);
+    }
+
+    public function test_store_requires_exactly_one_last_place_flag(): void
+    {
+        [$season, $race] = $this->createSeasonRace();
+        [$d1, $d2] = $this->createDrivers();
+        $admin = User::create(['name' => 'Admin', 'email' => 'admin@lastflag.com', 'password' => bcrypt('pw'), 'is_admin' => true]);
+
+        $this->actingAs($admin)
+            ->postJson("/api/races/{$race->id}/results", [
+                'results' => [
+                    ['driver_id' => $d1->id, 'position' => 1, 'is_pole' => true, 'fastest_lap' => false, 'is_last_place' => false],
+                    ['driver_id' => $d2->id, 'position' => 2, 'is_pole' => false, 'fastest_lap' => true, 'is_last_place' => false],
+                ],
+            ])
+            ->assertStatus(422)
+            ->assertJsonPath('message', 'Results must contain exactly one last-place driver');
+    }
+
+    public function test_calculate_uses_last_place_flag_even_without_position(): void
+    {
+        [$season, $race] = $this->createSeasonRace();
+        [$driverWin, $driverPole] = $this->createDrivers();
+        $team = Team::create(['name' => 'Fallback Team']);
+        $driverLast = Driver::forceCreate([
+            'team_id' => $team->id,
+            'name' => 'Last Flag Driver',
+            'country' => 'ES',
+            'short_code' => 'LFD',
+            'number' => 99,
+        ]);
+
+        $admin = User::create([
+            'name' => 'Global Admin',
+            'email' => 'admin@lastplace.com',
+            'password' => bcrypt('password'),
+            'is_admin' => true,
+        ]);
+
+        $player = User::create([
+            'name' => 'Player',
+            'email' => 'player@lastplace.com',
+            'password' => bcrypt('password'),
+        ]);
+
+        $championship = $this->createChampionship($season, $player);
+
+        Prediction::create([
+            'race_id' => $race->id,
+            'user_id' => $player->id,
+            'championship_id' => $championship->id,
+            'last_place' => $driverLast->id,
+        ]);
+
+        $this->actingAs($admin)->postJson("/api/races/{$race->id}/results", [
+            'results' => [
+                ['driver_id' => $driverWin->id, 'position' => 1, 'is_pole' => false, 'fastest_lap' => false, 'is_last_place' => false],
+                ['driver_id' => $driverPole->id, 'position' => 2, 'is_pole' => true, 'fastest_lap' => true, 'is_last_place' => false],
+                ['driver_id' => $driverLast->id, 'position' => null, 'is_pole' => false, 'fastest_lap' => false, 'is_last_place' => true],
+            ],
+        ])->assertStatus(200);
+
+        $this->actingAs($admin)->postJson("/api/races/{$race->id}/calculate")
+            ->assertStatus(200);
+
+        $this->assertDatabaseHas('race_points', [
+            'championship_id' => $championship->id,
+            'race_id' => $race->id,
+            'user_id' => $player->id,
+            'points' => 3,
+            'guessed_last_place' => true,
+        ]);
     }
 }

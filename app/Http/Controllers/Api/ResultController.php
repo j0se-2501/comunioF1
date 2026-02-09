@@ -41,6 +41,16 @@ class ResultController extends Controller
             'results.*.is_last_place' => 'boolean',
         ]);
 
+        $lastPlaceCount = collect($data['results'])
+            ->filter(fn ($entry) => !empty($entry['is_last_place']))
+            ->count();
+
+        if ($lastPlaceCount !== 1) {
+            return response()->json([
+                'message' => 'Results must contain exactly one last-place driver'
+            ], 422);
+        }
+
         // Eliminar resultados previos (correcciones)
         RaceResult::where('race_id', $race->id)->delete();
 
@@ -98,7 +108,7 @@ class ResultController extends Controller
             ->keyBy('position');
 
         // Último según posición (no flag)
-        $lastPositionResult = $results
+        $lastPlaceResult = $results->firstWhere('is_last_place', true) ?: $results
             ->whereNotNull('position')
             ->sortByDesc('position')
             ->first();
@@ -117,7 +127,7 @@ class ResultController extends Controller
                 $resultsByPosition,
                 $poleResult,
                 $fastestLapResult,
-                $lastPositionResult
+                $lastPlaceResult
             );
         }
 
@@ -135,7 +145,7 @@ class ResultController extends Controller
         $resultsByPosition,
         $poleResult,
         $fastestLapResult,
-        $lastPositionResult
+        $lastPlaceResult
     ) {
         $scoring = $championship->scoringSystem;
 
@@ -201,8 +211,8 @@ class ResultController extends Controller
             }
 
             // Last place (por posición más alta)
-            if ($prediction->last_place && $lastPositionResult) {
-                if ($prediction->last_place == $lastPositionResult->driver_id) {
+            if ($prediction->last_place && $lastPlaceResult) {
+                if ($prediction->last_place == $lastPlaceResult->driver_id) {
                     $points += $scoring->points_last_place;
                     $flags['guessed_last_place'] = true;
                 }
