@@ -127,14 +127,14 @@ class ChampionshipControllerTest extends TestCase
             'status' => 'active',
         ]);
 
-        // Ban the player first
+         
         $champ->users()->attach($player->id, ['is_banned' => true, 'total_points' => 0, 'position' => null]);
 
         $this->actingAs($player)
             ->postJson('/api/championships/join', ['invitation_code' => 'JOINCODE1'])
             ->assertStatus(403);
 
-        // Unban and try again
+         
         $champ->users()->updateExistingPivot($player->id, ['is_banned' => false]);
         $this->actingAs($player)
             ->postJson('/api/championships/join', ['invitation_code' => 'JOINCODE1'])

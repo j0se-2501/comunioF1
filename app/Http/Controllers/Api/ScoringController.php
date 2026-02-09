@@ -9,14 +9,14 @@ use Illuminate\Support\Facades\Auth;
 
 class ScoringController extends Controller
 {
-    /**
-     * Ver sistema de puntuación de un championship
-     */
+    
+
+
     public function show($championshipId)
     {
         $championship = Championship::with('scoringSystem')->findOrFail($championshipId);
 
-        // Solo miembros o admin deberían poder verlo; si quieres restringir más, se puede ajustar
+         
         if (!$championship->users()->where('user_id', Auth::id())->exists()
             && $championship->admin_id !== Auth::id()) {
             abort(403, 'You are not part of this championship');
@@ -25,9 +25,9 @@ class ScoringController extends Controller
         return response()->json($championship->scoringSystem);
     }
 
-    /**
-     * Actualizar sistema de puntuación (solo admin del championship)
-     */
+    
+
+
     public function update(Request $request, $championshipId)
     {
         $championship = Championship::with('scoringSystem')->findOrFail($championshipId);
@@ -54,9 +54,9 @@ class ScoringController extends Controller
         ]);
     }
 
-    /**
-     * Resetear sistema de puntuación a valores por defecto (solo admin)
-     */
+    
+
+
     public function reset($championshipId)
     {
         $championship = Championship::with('scoringSystem')->findOrFail($championshipId);
@@ -83,9 +83,9 @@ class ScoringController extends Controller
         ]);
     }
 
-    /**
-     * Comprobar que el user autenticado es admin del championship
-     */
+    
+
+
     private function authorizeAdmin(Championship $championship)
     {
         if ($championship->admin_id !== Auth::id()) {

@@ -14,14 +14,14 @@ class UsersAndChampionshipsSeeder extends Seeder
 {
     public function run(): void
     {
-        // Función para generar un casco aleatorio (URL absoluta al backend)
+         
         $randomHelmet = function () {
             $num = str_pad(rand(1, 20), 2, '0', STR_PAD_LEFT);
             $base = rtrim(config('app.url'), '/');
             return "{$base}/images/helmet_icons/{$num}.png";
         };
 
-        // Admin global de la plataforma
+         
         $admin = User::create([
             'name'       => 'Admin',
             'email'      => 'admin@admin.com',
@@ -31,7 +31,7 @@ class UsersAndChampionshipsSeeder extends Seeder
             'profile_pic'=> $randomHelmet(),
         ]);
 
-        // 30 usuarios Usuario01 .. Usuario30
+         
         $users = [];
 
         for ($i = 1; $i <= 30; $i++) {
@@ -47,13 +47,13 @@ class UsersAndChampionshipsSeeder extends Seeder
             ]);
         }
 
-        // Reindex para formar grupos de 10 usuarios por campeonato
+         
         $userChunks = array_chunk(array_values($users), 10);
 
-        // Obtener season 2026
+         
         $season = Season::where('year', 2026)->firstOrFail();
 
-        // Sistema de puntos por defecto
+         
         $defaultScoring = [
             'points_p1'          => 10,
             'points_p2'          => 6,
@@ -66,7 +66,7 @@ class UsersAndChampionshipsSeeder extends Seeder
             'points_last_place'  => 3,
         ];
 
-        // Helper para crear championship + scoring + miembros
+         
         $createChampionship = function (string $name, User $adminUser, array $members) use ($season, $defaultScoring) {
 
             $championship = Championship::create([
@@ -93,21 +93,21 @@ class UsersAndChampionshipsSeeder extends Seeder
             return $championship;
         };
 
-        // Championship 1
+         
         $createChampionship(
             'Liga de la clase',
             $users[1],
             $userChunks[0] ?? []
         );
 
-        // Championship 2
+         
         $createChampionship(
             'Torneo de los becarios',
             $users[11] ?? $users[2],
             $userChunks[1] ?? []
         );
 
-        // Championship 3
+         
         $createChampionship(
             'Campeonato de los colegas',
             $users[21] ?? $users[3],

@@ -10,27 +10,27 @@ use App\Models\User;
 
 class UserController extends Controller
 {
-    /**
-     * Ver perfil del usuario autenticado
-     */
+    
+
+
     public function me()
     {
         return response()->json(Auth::user());
     }
 
-    /**
-     * Actualizar perfil del usuario:
-     * - name
-     * - country
-     * - profile_pic (string URL, no subida de archivo)
-     */
+    
+
+
+
+
+
     public function update(Request $request)
     {
         $user = Auth::user();
 
         $data = $request->validate([
             'name'        => 'sometimes|string|max:255',
-            'country'     => 'sometimes|string|max:8', // emoji
+            'country'     => 'sometimes|string|max:8',  
             'profile_pic' => 'sometimes|string|nullable',
         ]);
 
@@ -42,9 +42,9 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * Cambiar contraseña del usuario
-     */
+    
+
+
     public function updatePassword(Request $request)
     {
         $user = Auth::user();
@@ -68,9 +68,9 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * Listar championships en los que participa el usuario autenticado
-     */
+    
+
+
     public function championships()
     {
         $user = Auth::user();
@@ -82,13 +82,13 @@ class UserController extends Controller
         return response()->json($championships);
     }
 
-    /**
-     * Obtener datos públicos de cualquier usuario:
-     * - id
-     * - name
-     * - country
-     * - profile_pic
-     */
+    
+
+
+
+
+
+
     public function show($userId)
     {
         $user = User::findOrFail($userId);

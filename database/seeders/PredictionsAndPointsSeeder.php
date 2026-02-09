@@ -32,7 +32,7 @@ class PredictionsAndPointsSeeder extends Seeder
         $driverCount = count($driverIds);
 
         foreach ($races as $raceIndex => $race) {
-            // Cache resultados reales
+             
             $results = RaceResult::where('race_id', $race->id)->get();
             $resultsByPosition = $results->whereNotNull('position')->keyBy('position');
             $lastPositionResult = $results->whereNotNull('position')->sortByDesc('position')->first();
@@ -44,7 +44,7 @@ class PredictionsAndPointsSeeder extends Seeder
                     continue;
                 }
 
-                // Seed predictions for every user in the championship
+                 
                 foreach ($championship->users as $user) {
                     $grid = $driverIds;
                     shuffle($grid);
@@ -73,7 +73,7 @@ class PredictionsAndPointsSeeder extends Seeder
                     );
                 }
 
-                // Calcular puntos para este championship y carrera
+                 
                 $scoring = $championship->scoringSystem;
 
                 $predictions = Prediction::where('championship_id', $championship->id)
@@ -137,7 +137,7 @@ class PredictionsAndPointsSeeder extends Seeder
                         array_merge(['points' => $points], $flags)
                     );
 
-                    // actualizar total_points en pivot
+                     
                     $totalPoints = RacePoint::where('championship_id', $championship->id)
                         ->where('user_id', $prediction->user_id)
                         ->sum('points');
@@ -148,7 +148,7 @@ class PredictionsAndPointsSeeder extends Seeder
                     );
                 }
 
-                // Recalcular posiciones en pivot
+                 
                 $orderedUsers = DB::table('championship_user')
                     ->where('championship_id', $championship->id)
                     ->orderByDesc('total_points')
@@ -166,7 +166,7 @@ class PredictionsAndPointsSeeder extends Seeder
             }
         }
 
-        // Crear standings finales (tras la 7a carrera)
+         
         $lastRace = $races->last();
         if ($lastRace) {
             foreach ($championships as $championship) {

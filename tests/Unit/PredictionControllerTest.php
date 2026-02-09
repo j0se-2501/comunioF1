@@ -114,7 +114,7 @@ class PredictionControllerTest extends TestCase
 
         $response->assertStatus(200);
 
-        // Predicción en campeonato origen
+         
         $this->assertDatabaseHas('predictions', [
             'championship_id' => $championshipA->id,
             'race_id' => $race->id,
@@ -123,7 +123,7 @@ class PredictionControllerTest extends TestCase
             'pole' => $drivers[1]->id,
         ]);
 
-        // Clon en otro championship de la misma season
+         
         $this->assertDatabaseHas('predictions', [
             'championship_id' => $championshipB->id,
             'race_id' => $race->id,

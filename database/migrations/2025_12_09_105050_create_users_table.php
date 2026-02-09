@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('password');
 
             $table->string('profile_pic')->nullable();
-            $table->string('country', 8)->nullable(); // emoji flag
+            $table->string('country', 8)->nullable();  
             $table->boolean('is_admin')->default(false);
 
             $table->rememberToken();

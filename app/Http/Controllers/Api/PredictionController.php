@@ -12,9 +12,9 @@ use Carbon\Carbon;
 
 class PredictionController extends Controller
 {
-    /**
-     * Obtener la proxima carrera disponible para predecir
-     */
+    
+
+
     public function nextRace($championshipId)
     {
         $championship = Championship::findOrFail($championshipId);
@@ -31,9 +31,9 @@ class PredictionController extends Controller
         return response()->json($nextRace);
     }
 
-    /**
-     * Ver prediccion del usuario autenticado para una carrera concreta
-     */
+    
+
+
     public function show($championshipId, $raceId)
     {
         $user = Auth::user();
@@ -47,10 +47,10 @@ class PredictionController extends Controller
         return response()->json($prediction);
     }
 
-    /**
-     * Ver prediccion y race points de un usuario para una carrera concreta.
-     * Solo accesible si el solicitante participa en el mismo campeonato.
-     */
+    
+
+
+
     public function showUser($championshipId, $raceId, $userId)
     {
         $authUser = Auth::user();
@@ -92,9 +92,9 @@ class PredictionController extends Controller
         return response()->json($prediction);
     }
 
-    /**
-     * Crear o editar prediccion para una carrera
-     */
+    
+
+
     public function store(Request $request, $championshipId, $raceId)
     {
         $user = Auth::user();
@@ -114,17 +114,17 @@ class PredictionController extends Controller
         $championship = Championship::findOrFail($championshipId);
         $race = Race::findOrFail($raceId);
 
-        // 1. Validar que la carrera no ha empezado (qualy como deadline)
+         
         if ($race->qualy_date && Carbon::parse($race->qualy_date)->isPast()) {
             return response()->json(['message' => 'Predictions are closed for this race'], 403);
         }
 
-        // 2. Validar que el usuario pertenece al championship
+         
         if (!$championship->users()->where('user_id', $user->id)->exists()) {
             return response()->json(['message' => 'You are not part of this championship'], 403);
         }
 
-        // 3. Crear o actualizar la prediccion en ESTE championship
+         
         $prediction = Prediction::updateOrCreate(
             [
                 'championship_id' => $championshipId,
@@ -134,7 +134,7 @@ class PredictionController extends Controller
             $data
         );
 
-        // 4. Replicar en otros championships donde participa el usuario (misma season)
+         
         $sameSeasonChampionships = $user->championships()
             ->where('season_id', $championship->season_id)
             ->where('championship_id', '!=', $championshipId)

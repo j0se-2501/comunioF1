@@ -13,9 +13,9 @@ use Illuminate\Support\Facades\Auth;
 
 class ResultController extends Controller
 {
-    /**
-     * Solo los admins globales pueden introducir resultados
-     */
+    
+
+
     private function authorizeGlobalAdmin()
     {
         if (!Auth::user() || !Auth::user()->is_admin) {
@@ -23,9 +23,9 @@ class ResultController extends Controller
         }
     }
 
-    /**
-     * Guardar resultados oficiales de una carrera
-     */
+    
+
+
     public function store(Request $request, $raceId)
     {
         $this->authorizeGlobalAdmin();
@@ -51,7 +51,7 @@ class ResultController extends Controller
             ], 422);
         }
 
-        // Eliminar resultados previos (correcciones)
+         
         RaceResult::where('race_id', $race->id)->delete();
 
         foreach ($data['results'] as $entry) {
@@ -70,16 +70,16 @@ class ResultController extends Controller
         ]);
     }
 
-    /**
-     * Marcar una carrera como confirmada
-     */
+    
+
+
     public function confirm($raceId)
     {
         $this->authorizeGlobalAdmin();
 
         $race = Race::findOrFail($raceId);
 
-        // Marcar resultados como confirmados con el flag existente
+         
         $race->update(['is_result_confirmed' => true]);
 
         return response()->json([
@@ -87,9 +87,9 @@ class ResultController extends Controller
         ]);
     }
 
-    /**
-     * Calcular puntos de todos los championships para esta carrera
-     */
+    
+
+
     public function calculate($raceId)
     {
         $this->authorizeGlobalAdmin();
@@ -102,7 +102,7 @@ class ResultController extends Controller
             return response()->json(['message' => 'No results found'], 400);
         }
 
-        // Indexar resultados por posición numérica
+         
         $resultsByPosition = $results
             ->whereNotNull('position')
             ->keyBy('position');
@@ -113,11 +113,11 @@ class ResultController extends Controller
             ->sortByDesc('position')
             ->first();
 
-        // Pole y Fastest Lap
+         
         $poleResult = $results->firstWhere('is_pole', true);
         $fastestLapResult = $results->firstWhere('fastest_lap', true);
 
-        // Championships de la misma season
+         
         $championships = Championship::where('season_id', $race->season_id)->get();
 
         foreach ($championships as $championship) {
@@ -136,9 +136,9 @@ class ResultController extends Controller
         ]);
     }
 
-    /**
-     * Cálculo para un championship concreto
-     */
+    
+
+
     private function calculateForChampionship(
         Championship $championship,
         Race $race,
@@ -157,7 +157,7 @@ class ResultController extends Controller
 
             $points = 0;
 
-            // Campos guessed
+             
             $flags = [
                 'guessed_p1' => false,
                 'guessed_p2' => false,
@@ -170,7 +170,7 @@ class ResultController extends Controller
                 'guessed_last_place' => false,
             ];
 
-            // Helper
+             
             $checkPosition = function ($predictedDriverId, $positionKey, $scoreValue, $flagKey) 
                 use (&$points, &$flags, $resultsByPosition) 
             {
@@ -186,7 +186,7 @@ class ResultController extends Controller
                 }
             };
 
-            // Top 6
+             
             $checkPosition($prediction->position_1, 1, $scoring->points_p1, 'guessed_p1');
             $checkPosition($prediction->position_2, 2, $scoring->points_p2, 'guessed_p2');
             $checkPosition($prediction->position_3, 3, $scoring->points_p3, 'guessed_p3');
@@ -194,7 +194,7 @@ class ResultController extends Controller
             $checkPosition($prediction->position_5, 5, $scoring->points_p5, 'guessed_p5');
             $checkPosition($prediction->position_6, 6, $scoring->points_p6, 'guessed_p6');
 
-            // Pole
+             
             if ($prediction->pole && $poleResult) {
                 if ($prediction->pole == $poleResult->driver_id) {
                     $points += $scoring->points_pole;
@@ -202,7 +202,7 @@ class ResultController extends Controller
                 }
             }
 
-            // Fastest lap
+             
             if ($prediction->fastest_lap && $fastestLapResult) {
                 if ($prediction->fastest_lap == $fastestLapResult->driver_id) {
                     $points += $scoring->points_fastest_lap;
@@ -218,7 +218,7 @@ class ResultController extends Controller
                 }
             }
 
-            // Guardar RacePoint
+             
             RacePoint::updateOrCreate(
                 [
                     'prediction_id'   => $prediction->id,
@@ -232,20 +232,20 @@ class ResultController extends Controller
                 )
             );
 
-            // Actualizar total_points del user en championship_user
+             
             $championship->users()->updateExistingPivot(
                 $prediction->user_id,
                 ['total_points' => $this->totalUserPoints($championship->id, $prediction->user_id)]
             );
         }
 
-        // Recalcular posiciones del campeonato
+         
         $this->updateStandings($championship);
     }
 
-    /**
-     * Total de puntos acumulados por un usuario
-     */
+    
+
+
     private function totalUserPoints($championshipId, $userId)
     {
         return RacePoint::where('championship_id', $championshipId)
@@ -253,9 +253,9 @@ class ResultController extends Controller
             ->sum('points');
     }
 
-    /**
-     * Recalcular standings
-     */
+    
+
+
     private function updateStandings(Championship $championship)
     {
         $users = $championship->users()
@@ -273,9 +273,9 @@ class ResultController extends Controller
         }
     }
 
-    /**
-     * Obtener race points filtrados por campeonato y carrera
-     */
+    
+
+
     public function racePoints($championshipId, $raceId)
     {
         $racePoints = RacePoint::where('championship_id', $championshipId)

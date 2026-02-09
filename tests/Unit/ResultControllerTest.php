@@ -115,7 +115,7 @@ class ResultControllerTest extends TestCase
 
         $championship = $this->createChampionship($season, $player);
 
-        // Player prediction: wins + pole
+         
         Prediction::create([
             'race_id' => $race->id,
             'user_id' => $player->id,
@@ -124,7 +124,7 @@ class ResultControllerTest extends TestCase
             'pole' => $driverPole->id,
         ]);
 
-        // Store official results (admin)
+         
         $this->actingAs($admin)->postJson("/api/races/{$race->id}/results", [
             'results' => [
                 ['driver_id' => $driverWin->id, 'position' => 1, 'is_pole' => false, 'fastest_lap' => false, 'is_last_place' => false],
@@ -132,21 +132,21 @@ class ResultControllerTest extends TestCase
             ],
         ])->assertStatus(200);
 
-        // Calculate points
+         
         $this->actingAs($admin)->postJson("/api/races/{$race->id}/calculate")
             ->assertStatus(200);
 
-        // Race points exist
+         
         $this->assertDatabaseHas('race_points', [
             'championship_id' => $championship->id,
             'race_id' => $race->id,
             'user_id' => $player->id,
-            'points' => 13, // 10 (P1) + 3 (pole)
+            'points' => 13,  
             'guessed_p1' => true,
             'guessed_pole' => true,
         ]);
 
-        // Total points updated in pivot
+         
         $this->assertDatabaseHas('championship_user', [
             'championship_id' => $championship->id,
             'user_id' => $player->id,
@@ -175,7 +175,7 @@ class ResultControllerTest extends TestCase
         [$d1, $d2] = $this->createDrivers();
         $admin = User::create(['name' => 'Admin', 'email' => 'admin@store.com', 'password' => bcrypt('pw'), 'is_admin' => true]);
 
-        // First save
+         
         $this->actingAs($admin)
             ->postJson("/api/races/{$race->id}/results", [
                 'results' => [
@@ -184,7 +184,7 @@ class ResultControllerTest extends TestCase
             ])
             ->assertOk();
 
-        // Replace
+         
         $this->actingAs($admin)
             ->postJson("/api/races/{$race->id}/results", [
                 'results' => [

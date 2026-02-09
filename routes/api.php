@@ -12,37 +12,37 @@ use App\Http\Controllers\Api\ScoringController;
 use App\Http\Controllers\Api\DriverController;
 use App\Http\Controllers\Api\SeasonController;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-| Estas rutas exponen la API REST para el frontend SPA.
-| Pública: register/login.
-| Protegida con auth:sanctum: todo lo demás.
-*/
 
-// Auth pública
+
+
+
+
+
+
+
+
+ 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware('auth:sanctum')->group(function () {
-    // Auth protegida
+     
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    // User
+     
     Route::get('/me', [UserController::class, 'me']);
     Route::match(['put', 'patch'], '/user', [UserController::class, 'update']);
     Route::put('/user/password', [UserController::class, 'updatePassword']);
     Route::get('/user/championships', [UserController::class, 'championships']);
     Route::get('/users/{user}', [UserController::class, 'show']);
 
-    // Drivers
+     
     Route::get('/drivers', [DriverController::class, 'index']);
 
-    // Seasons
+     
     Route::get('/seasons', [SeasonController::class, 'index']);
 
-    // Championships
+     
     Route::prefix('championships')->group(function () {
         Route::get('/', [ChampionshipController::class, 'index']);
         Route::post('/', [ChampionshipController::class, 'store']);
@@ -64,27 +64,27 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::match(['put', 'patch'], '/{id}/scoring', [ChampionshipController::class, 'updateScoring']);
     });
 
-    // Scoring (si se usa controlador dedicado)
+     
     Route::prefix('championships/{id}/scoring')->group(function () {
         Route::get('/', [ScoringController::class, 'show']);
         Route::match(['put', 'patch'], '/', [ScoringController::class, 'update']);
         Route::post('/reset', [ScoringController::class, 'reset']);
     });
 
-    // Predictions
+     
     Route::get('/championships/{id}/races/next', [PredictionController::class, 'nextRace']);
     Route::get('/championships/{id}/races/{raceId}/prediction', [PredictionController::class, 'show']);
     Route::get('/championships/{id}/races/{raceId}/predictions/{userId}', [PredictionController::class, 'showUser']);
     Route::post('/championships/{id}/races/{raceId}/prediction', [PredictionController::class, 'store']);
 
-    // Races (consulta)
+     
     Route::get('/races/next', [RaceController::class, 'next']);
     Route::get('/races/last', [RaceController::class, 'last']);
     Route::get('/seasons/{seasonId}/races', [RaceController::class, 'index']);
     Route::get('/races/{raceId}', [RaceController::class, 'show']);
     Route::get('/races/{raceId}/results', [RaceController::class, 'results']);
 
-    // Results & points (admin global en controlador)
+     
     Route::post('/races/{raceId}/results', [ResultController::class, 'store']);
     Route::post('/races/{raceId}/confirm', [ResultController::class, 'confirm']);
     Route::post('/races/{raceId}/calculate', [ResultController::class, 'calculate']);

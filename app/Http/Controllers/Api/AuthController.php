@@ -11,9 +11,9 @@ use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
-    /**
-     * Registro de usuario
-     */
+    
+
+
     public function register(Request $request)
     {
         $data = $request->validate([
@@ -32,7 +32,7 @@ class AuthController extends Controller
             'profile_pic' => $data['profile_pic'] ?? null,
         ]);
 
-        // Autologin tras registro
+         
         Auth::login($user);
         $request->session()->regenerate();
 
@@ -42,9 +42,9 @@ class AuthController extends Controller
         ]);
     }
 
-    /**
-     * Login
-     */
+    
+
+
     public function login(Request $request)
     {
 
@@ -66,7 +66,7 @@ class AuthController extends Controller
             ], 401);
         }
 
-        // Importante regenerar sesión
+         
         $request->session()->regenerate();
 
         return response()->json([
@@ -75,17 +75,17 @@ class AuthController extends Controller
         ]);
     }
 
-    /**
-     * Logout
-     */
+    
+
+
     public function logout(Request $request)
     {
         Auth::guard('web')->logout();
 
-        // Invalidar sesión actual
+         
         $request->session()->invalidate();
 
-        // Regenerar token CSRF
+         
         $request->session()->regenerateToken();
 
         return response()->json([
