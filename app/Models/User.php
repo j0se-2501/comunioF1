@@ -24,13 +24,13 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    // Campeonatos que administra
+     
     public function championshipsOwned()
     {
         return $this->hasMany(Championship::class, 'admin_id');
     }
 
-    // Campeonatos donde participa
+     
     public function championships()
     {
         return $this->belongsToMany(Championship::class)

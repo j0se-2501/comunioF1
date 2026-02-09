@@ -12,7 +12,7 @@ class Season2026Seeder extends Seeder
 {
     public function run(): void
     {
-        // Crear la season 2026
+         
         $season = Season::create([
             'name' => 'Temporada 2026',
             'description' => 'Calendario oficial Formula 1 2026',
@@ -20,7 +20,7 @@ class Season2026Seeder extends Seeder
             'is_current_season' => true,
         ]);
 
-        // Lista de carreras 2026 (solo fecha)
+         
         $races = [
             ['Australia', '2026-03-08'],
             ['China', '2026-03-15'],
@@ -48,7 +48,7 @@ class Season2026Seeder extends Seeder
             ['Abu Dhabi', '2026-12-06'],
         ];
 
-        // Drivers para componer resultados; se barajan por carrera
+         
         $driverIds = Driver::orderBy('id')->pluck('id')->all();
         $driverCount = count($driverIds);
 
@@ -63,16 +63,16 @@ class Season2026Seeder extends Seeder
                 'round_number'         => $index + 1,
                 'race_date'            => $raceDate,
                 'qualy_date'           => $qualyDate,
-                // Primeras 7 carreras (indices 0-6) con resultado confirmado
+                 
                 'is_result_confirmed'  => $index < 7,
             ]);
 
-            // Para las primeras 7 carreras, generar resultados completos (aleatorios)
+             
             if ($index < 7 && $driverCount > 0) {
                 $grid = $driverIds;
                 shuffle($grid);
 
-                // Elegir aleatoriamente quién hace la vuelta rápida (entre top 10 o toda la parrilla si <10)
+                 
                 $fastestIndexPool = min(9, $driverCount - 1);
                 $fastestLapIndex = mt_rand(0, $fastestIndexPool);
 

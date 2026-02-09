@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('name');
             $table->integer('round_number');
 
-            // AHORA SON DATETIME
+             
             $table->dateTime('race_date');
             $table->dateTime('qualy_date');
 

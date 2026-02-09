@@ -7,9 +7,9 @@ use App\Models\Season;
 
 class SeasonController extends Controller
 {
-    /**
-     * List all seasons (protected, only authenticated users).
-     */
+    
+
+
     public function index()
     {
         return response()->json(

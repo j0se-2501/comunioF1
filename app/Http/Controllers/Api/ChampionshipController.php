@@ -13,9 +13,9 @@ use Illuminate\Support\Str;
 
 class ChampionshipController extends Controller
 {
-    /**
-     * Listar los championships donde participa o administra el user
-     */
+    
+
+
     public function index()
     {
         $user = Auth::user();
@@ -30,14 +30,14 @@ class ChampionshipController extends Controller
         return response()->json($championships);
     }
 
-    /**
-     * Crear un nuevo championship
-     */
+    
+
+
     public function store(Request $request)
     {
         $user = Auth::user();
 
-        // Limite se calcula solo con campeonatos donde no está baneado
+         
         $activeUserChampCount = $user->championships()
             ->wherePivot('is_banned', false)
             ->count();
@@ -61,7 +61,7 @@ class ChampionshipController extends Controller
             'status'          => 'active',
         ]);
 
-        // Crear scoring system por defecto
+         
         ScoringSystem::create([
             'championship_id'   => $championship->id,
             'points_p1'         => 10,
@@ -75,7 +75,7 @@ class ChampionshipController extends Controller
             'points_last_place' => 3,
         ]);
 
-        // El admin entra automáticamente como miembro
+         
         $championship->users()->attach($user->id, [
             'total_points' => 0,
             'is_banned'    => false,
@@ -88,9 +88,9 @@ class ChampionshipController extends Controller
         ]);
     }
 
-    /**
-     * Ver detalles del championship
-     */
+    
+
+
     public function show($id)
     {
         $championship = Championship::with([
@@ -104,9 +104,9 @@ class ChampionshipController extends Controller
         return response()->json($championship);
     }
 
-    /**
-     * Editar championship (solo admin)
-     */
+    
+
+
     public function update(Request $request, $id)
     {
         $championship = Championship::findOrFail($id);
@@ -127,9 +127,9 @@ class ChampionshipController extends Controller
         ]);
     }
 
-    /**
-     * Ver código de invitación
-     */
+    
+
+
     public function invitationCode($id)
     {
         $championship = Championship::findOrFail($id);
@@ -141,9 +141,9 @@ class ChampionshipController extends Controller
         ]);
     }
 
-    /**
-     * Regenerar código de invitación
-     */
+    
+
+
     public function regenerateInvitationCode($id)
     {
         $championship = Championship::findOrFail($id);
@@ -160,9 +160,9 @@ class ChampionshipController extends Controller
         ]);
     }
 
-    /**
-     * Unirse a un championship usando código de invitación
-     */
+    
+
+
     public function join(Request $request)
     {
         $data = $request->validate([
@@ -177,14 +177,14 @@ class ChampionshipController extends Controller
 
         $user = Auth::user();
 
-        // Verificar si está baneado
+         
         $pivot = $championship->users()->where('user_id', $user->id)->first();
 
         if ($pivot && $pivot->pivot->is_banned) {
             return response()->json(['message' => 'You are banned from this championship'], 403);
         }
 
-        // Si ya está unido, devolver ok
+         
         if ($championship->users()->where('user_id', $user->id)->exists()) {
             return response()->json(['message' => 'Already joined'], 200);
         }
@@ -217,15 +217,15 @@ class ChampionshipController extends Controller
         ]);
     }
 
-    /**
-     * Abandonar championship
-     */
+    
+
+
     public function leave($id)
 {
     $championship = Championship::findOrFail($id);
     $userId = Auth::id();
 
-    // Si el que abandona es el admin, se elimina el campeonato entero
+     
     if ($championship->admin_id == $userId) {
         $championship->delete();
 
@@ -234,7 +234,7 @@ class ChampionshipController extends Controller
         ]);
     }
 
-    // Si no es admin, simplemente se desvincula del campeonato
+     
     $championship->users()->detach($userId);
 
     return response()->json([
@@ -243,9 +243,9 @@ class ChampionshipController extends Controller
 }
 
 
-    /**
-     * Banear usuario
-     */
+    
+
+
     public function banUser($id, $userId)
     {
         $championship = Championship::findOrFail($id);
@@ -259,9 +259,9 @@ class ChampionshipController extends Controller
         return response()->json(['message' => 'User banned']);
     }
 
-    /**
-     * Desbanear usuario
-     */
+    
+
+
     public function unbanUser($id, $userId)
     {
         $championship = Championship::findOrFail($id);
@@ -275,9 +275,9 @@ class ChampionshipController extends Controller
         return response()->json(['message' => 'User unbanned']);
     }
 
-    /**
-     * Listar miembros del championship
-     */
+    
+
+
     public function members($id)
     {
         $championship = Championship::findOrFail($id);
@@ -290,9 +290,9 @@ class ChampionshipController extends Controller
         return response()->json($members);
     }
 
-    /**
-     * Listar miembros no baneados
-     */
+    
+
+
     public function activeMembers($id)
     {
         $championship = Championship::findOrFail($id);
@@ -306,9 +306,9 @@ class ChampionshipController extends Controller
         return response()->json($members);
     }
 
-    /**
-     * Listar miembros baneados
-     */
+    
+
+
     public function bannedMembers($id)
     {
         $championship = Championship::findOrFail($id);
@@ -322,10 +322,9 @@ class ChampionshipController extends Controller
         return response()->json($members);
     }
 
-    /**
-     * Actualizar scoring system
-     * (si no usas ScoringController independiente)
-     */
+    
+
+
     public function updateScoring(Request $request, $id)
     {
         $championship = Championship::findOrFail($id);
@@ -352,9 +351,9 @@ class ChampionshipController extends Controller
         ]);
     }
 
-    /**
-     * Verificar si el user autenticado es admin
-     */
+    
+
+
     private function authorizeAdmin(Championship $championship)
     {
         if ($championship->admin_id !== Auth::id()) {

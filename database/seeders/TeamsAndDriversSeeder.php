@@ -203,7 +203,7 @@ class TeamsAndDriversSeeder extends Seeder
 
         foreach ($teams as $teamName => $data) {
 
-            // Aquí solo usamos 'name' porque es lo único que existe en la tabla teams
+             
             $team = Team::create([
                 'name' => $teamName,
             ]);

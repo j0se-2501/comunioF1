@@ -2,14 +2,14 @@
 
 return [
 
-    /*
-    |--------------------------------------------------------------------------
-    | Laravel CORS Configuration
-    |--------------------------------------------------------------------------
-    |
-    | Este archivo asegura CORS con credenciales para el front en localhost:3000
-    |
-    */
+    
+
+
+
+
+
+
+
 
     'paths' => ['api/*', 'sanctum/csrf-cookie'],
 

@@ -119,7 +119,7 @@ class UserControllerTest extends TestCase
         $this->actingAs($this->user())
             ->getJson("/api/users/{$user->id}")
             ->assertOk()
-            ->assertJsonMissing(['email']) // Solo datos públicos
+            ->assertJsonMissing(['email'])  
             ->assertJsonFragment(['id' => $user->id, 'name' => $user->name]);
     }
 }
